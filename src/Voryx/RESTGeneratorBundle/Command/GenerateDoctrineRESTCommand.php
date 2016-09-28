@@ -123,7 +123,7 @@ class GenerateDoctrineRESTCommand extends GenerateDoctrineCrudCommand
 
         $generator = $this->getGenerator($entityBundle);
         $generator->generate($entityBundle, $targetBundle, $entity, $parents, $exclude, $metadata[0]);
-        $this->generateForm($targetBundle, $entity, $metadata, true);
+        $this->generateForm($entityBundle, $entity, $metadata, true);
     }
 
     private function getCommandLineOptionAsArray(InputInterface $input, $option) {

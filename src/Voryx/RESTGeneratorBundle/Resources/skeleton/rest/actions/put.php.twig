@@ -2,7 +2,7 @@
     /**
      * Update a {{ entity }} entity.
      *
-     * @Put("/{{ route_prefix }}/{id}")
+     * @Put("/{{ route_prefix }}/{id}", requirements={"id" = "\d+"})
      * @View(serializerEnableMaxDepthChecks=true)
      *
      * @Secure(roles="{{ roles['update'] }}")

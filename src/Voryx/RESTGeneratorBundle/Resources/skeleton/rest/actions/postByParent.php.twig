@@ -2,7 +2,7 @@
     /**
      * Create a {{ entity }} entity and nest it under the given {{ parent }} entity.
      *
-     * @Post("/{{ parent_route }}/{id}/{{ route_prefix }}")
+     * @Post("/{{ parent_route }}/{id}/{{ route_prefix }}", requirements={"id" = "\d+"})
      * @View(statusCode=201, serializerEnableMaxDepthChecks=true)
      * @Secure(roles="{{ roles['create']}}")
      *

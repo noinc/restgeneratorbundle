@@ -2,7 +2,7 @@
     /**
      * Partial Update to a {{ entity }} entity.
      *
-     * @Patch("/{{ route_prefix }}/{id}")
+     * @Patch("/{{ route_prefix }}/{id}", requirements={"id" = "\d+"})
      * @View(serializerEnableMaxDepthChecks=true)
      * @Secure(roles="{{ roles['update'] }}")
      *

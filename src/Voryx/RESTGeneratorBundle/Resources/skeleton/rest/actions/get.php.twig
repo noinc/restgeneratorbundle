@@ -1,7 +1,7 @@
 /**
      * Get a {{ entity }} entity
      *
-     * @Get("/{{ route_prefix }}/{id}")
+     * @Get("/{{ route_prefix }}/{id}", requirements={"id" = "\d+"})
      * @View(serializerEnableMaxDepthChecks=true)
      * @Secure(roles="{{ roles['read'] }}")
      *

@@ -6,9 +6,11 @@
      * @View(serializerEnableMaxDepthChecks=true)
      * @Secure(roles="{{ roles['read'] }}")
      *
+     * @param Request $request
+     *
      * @return Response
      */
-    public function cgetAction()
+    public function cgetAction(Request $request)
     {
 		return $this->cget();
     }

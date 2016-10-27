@@ -6,9 +6,12 @@
      * @View(serializerEnableMaxDepthChecks=true)
      * @Secure(roles="{{ roles['read'] }}")
      *
+     * @param Request $request
+     * @param {{ parent }} ${{ parent | lower }}
+     *
      * @return Response
      */
-    public function cgetBy{{ parent }}Action({{ parent }} ${{ parent | lower }})
+    public function cgetBy{{ parent }}Action(Request $request, {{ parent }} ${{ parent | lower }})
     {
 		return $this->cgetByParent(${{ parent | lower }});
     }

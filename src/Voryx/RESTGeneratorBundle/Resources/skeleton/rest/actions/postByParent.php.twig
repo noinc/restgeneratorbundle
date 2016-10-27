@@ -11,7 +11,7 @@
      * @return Response
      *
      */
-    public function postBy{{ parent }}Action({{ parent }} ${{ parent | lower }}, Request $request)
+    public function postBy{{ parent }}Action(Request $request, {{ parent }} ${{ parent | lower }})
     {
 		$entity = new {{ entity }}();
         $entity->set{{ parent }}(${{ parent | lower }});

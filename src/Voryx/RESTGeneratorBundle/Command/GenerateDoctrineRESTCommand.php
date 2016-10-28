@@ -36,7 +36,8 @@ class GenerateDoctrineRESTCommand extends GenerateDoctrineCrudCommand
                 new InputOption('entity', '', InputOption::VALUE_REQUIRED, 'The entity class name to initialize (shortcut notation)'),
                 new InputOption('parents', '', InputOption::VALUE_OPTIONAL, 'A comma-separated list of parents (used to create additional endpoints nested under each parent)'),
                 new InputOption('config', '', InputOption::VALUE_OPTIONAL, 'Path to the config file to use for API generation'),
-                new InputOption('exclude', '', InputOption::VALUE_OPTIONAL, 'A comma-separated list of actions to exclude from API generation (i.e. getAll, post, delete)')
+                new InputOption('exclude', '', InputOption::VALUE_OPTIONAL, 'A comma-separated list of actions to exclude from API generation (i.e. getAll, post, delete)'),
+                new InputOption('overwrite', '', InputOption::VALUE_OPTIONAL, 'Overwrite the form generated')
             )
         )
             ->setDescription('Generates a REST api based on a Doctrine entity')
@@ -44,11 +45,11 @@ class GenerateDoctrineRESTCommand extends GenerateDoctrineCrudCommand
             ->setName('voryx:generate:rest')
             ->setAliases(array('generate:voryx:rest'));
     }
-    
+
     /**
      * This method is executed BEFORE execute().
-     * Its purpose is to check if some of the options/arguments are missing and interactively ask the user for those values. 
-     * This is the last place where you can ask for missing options/arguments. 
+     * Its purpose is to check if some of the options/arguments are missing and interactively ask the user for those values.
+     * This is the last place where you can ask for missing options/arguments.
      * After this command, missing options/arguments will result in an error.
      * @param InputInterface $input
      * @param OutputInterface $output
@@ -83,7 +84,8 @@ class GenerateDoctrineRESTCommand extends GenerateDoctrineCrudCommand
         foreach ($entities as $entity => $options) {
             $parents = $this->getYamlOptionAsArray($options, "parents");
             $exclude = $this->getYamlOptionAsArray($options, "exclude");
-            $this->generate($dataBundle, $apiBundle, $entity, $parents, $exclude);
+            $overwrite = $this->getYamlOptionAsBoolean($options, "overwrite");
+            $this->generate($dataBundle, $apiBundle, $entity, $parents, $exclude, $overwrite);
             $this->generateRolesForEntity($entity, $roles);
         }
         $this->generatePermissionsYaml($roles, $apiBundle);
@@ -111,11 +113,12 @@ class GenerateDoctrineRESTCommand extends GenerateDoctrineCrudCommand
         $entity = $input->getOption('entity');
         $parents = $this->getCommandLineOptionAsArray($input, 'parents');
         $exclude = $this->getCommandLineOptionAsArray($input, 'exclude');
+        $entity = $input->getOption('overwrite');
 
-        $this->generate($dataBundle, $apiBundle, $entity, $parents, $exclude);
+        $this->generate($dataBundle, $apiBundle, $entity, $parents, $exclude, $overwrite);
     }
 
-    private function generate($dataBundle, $apiBundle, $entity, $parents, $exclude) {
+    private function generate($dataBundle, $apiBundle, $entity, $parents, $exclude, $overwrite) {
         $entityClass  = $this->getContainer()->get('doctrine')->getAliasNamespace($dataBundle) . '\\' . $entity;
         $entityBundle = $this->getContainer()->get('kernel')->getBundle($dataBundle);
         $targetBundle = $this->getContainer()->get('kernel')->getBundle($apiBundle);
@@ -123,7 +126,18 @@ class GenerateDoctrineRESTCommand extends GenerateDoctrineCrudCommand
 
         $generator = $this->getGenerator($entityBundle);
         $generator->generate($entityBundle, $targetBundle, $entity, $parents, $exclude, $metadata[0]);
-        $this->generateForm($entityBundle, $entity, $metadata, true);
+
+        try
+        {
+            $this->generateForm($entityBundle, $entity, $metadata, !$overwrite);
+        }
+        catch ( \Exception $ex )
+        {
+            if ( !$overwrite )
+            {
+                throw $ex;
+            }
+        }
     }
 
     private function getCommandLineOptionAsArray(InputInterface $input, $option) {
@@ -133,6 +147,10 @@ class GenerateDoctrineRESTCommand extends GenerateDoctrineCrudCommand
 
     private function getYamlOptionAsArray($options, $key) {
         return isset($options[$key]) ? $options[$key] : [];
+    }
+
+    private function getYamlOptionAsBoolean($options, $key) {
+        return isset($options[$key]) ? true : false;
     }
 
     /**
@@ -186,3 +204,4 @@ in order to know the file structure of the skeleton
 EOT;
     }
 }
+

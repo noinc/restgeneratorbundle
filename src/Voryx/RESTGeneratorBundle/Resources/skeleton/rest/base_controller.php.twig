@@ -15,6 +15,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Response;
 use Voryx\RESTGeneratorBundle\Serialization\DataTables;
 use Doctrine\Common\Inflector\Inflector;
+use Doctrine\ORM\PersistentCollection;
 
 /**
  * Base controller for all the rest controllers.
@@ -25,16 +26,16 @@ abstract class NoIncBaseRESTController extends Controller
 {
     /**
      * Get an entity.
-     * 
+     *
      * @param $entity
-     * 
+     *
      * @return Response
      */
     public function get($entity)
     {
         return $entity;
     }
-    
+
     /**
      * Get all entities.
      *
@@ -45,6 +46,10 @@ abstract class NoIncBaseRESTController extends Controller
         try {
             $repository = $this->getDoctrine()->getManager()->getRepository('NoIncQrisDataBundle:' . $this->getEntityName());
             $entities = $repository->findAll();
+            if ( $entities instanceof PersistentCollection )
+            {
+                $entities = $entities->getValues();
+            }
             return $entities;
         } catch (\Exception $e) {
         	return FOSView::create($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -61,7 +66,12 @@ abstract class NoIncBaseRESTController extends Controller
     public function cgetByParent($entity)
     {
         $getter = "get" . Inflector::pluralize($this->getEntityName());
-        return $entity->{$getter}();
+        $entities = $entity->{$getter}();
+        if ( $entities instanceof PersistentCollection )
+        {
+            $entities = $entities->getValues();
+        }
+        return $entities;
     }
 
     /**
@@ -106,7 +116,7 @@ abstract class NoIncBaseRESTController extends Controller
             $em = $this->getDoctrine()->getManager();
             $this->removeExtraFields($request, $form);
             $form->handleRequest($request);
-            
+
             if ($form->isValid()) {
                 $em->flush();
                 return $entity;
@@ -156,10 +166,10 @@ abstract class NoIncBaseRESTController extends Controller
     		$data,
     		$options
     	);
-    
+
     	return $form;
     }
-    
+
     /**
      * Get rid on any fields that don't appear in the form
      *
@@ -173,6 +183,6 @@ abstract class NoIncBaseRESTController extends Controller
     	$data     = array_intersect_key($data, $children);
     	$request->request->replace($data);
     }
-    
+
     abstract function getEntityName();
 }

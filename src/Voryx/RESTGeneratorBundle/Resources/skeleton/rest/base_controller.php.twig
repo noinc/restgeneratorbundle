@@ -70,7 +70,7 @@ abstract class NoIncBaseRESTController extends Controller
         if ( $entities instanceof PersistentCollection )
         {
             //Don't need to do this here as it has the opposite effect
-            //$entities = $entities->getValues();
+            $entities = $entities->getValues();
         }
         return $entities;
     }

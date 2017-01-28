@@ -13,5 +13,5 @@
      */
     public function deleteAction(Request $request, {{ entity }} $entity)
     {
-		$this->delete($request, $entity);
+		return $this->delete($request, $entity);
     }

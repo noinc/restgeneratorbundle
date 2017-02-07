@@ -70,7 +70,7 @@ class DoctrineRESTGenerator extends Generator
         //$this->tests		   = array('testGetAll', 'testGetById', 'testPost', 'testPut', 'testPatch', 'testDelete');
         //$this->parentTests   = array('testGetAllByParent', 'testPostByParent');
         $this->actions         = array_diff(self::ACTIONS, $exclude);
-        $this->parentActions   = self::PARENT_ACTIONS;
+        $this->parentActions   = array_diff(self::PARENT_ACTIONS, $exclude);
         $this->roles           = [
             'create' =>  'ROLE_' . strtoupper($entity) . '_CREATE',
             'read'   =>  'ROLE_' . strtoupper($entity) . '_READ',

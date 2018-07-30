@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use FOS\RestBundle\Context\Context;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\View;
@@ -183,6 +184,24 @@ abstract class NoIncBaseRESTController extends Controller
     	$children = $form->all();
     	$data     = array_intersect_key($data, $children);
     	$request->request->replace($data);
+    }
+
+    protected function createViewObject($data, $groups = []) {
+        $view = FOSView::create();
+
+        $context = new Context();
+        foreach ( $groups as $group ) {
+            $context->addGroup($group);
+        }
+
+        if ( count($groups) > 0 ) {
+            $context->setMaxDepth(null);
+        }
+
+        $view->setContext($context);
+        $view->setData($data);
+
+        return $view;
     }
 
     abstract function getEntityName();
